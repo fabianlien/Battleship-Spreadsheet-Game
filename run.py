@@ -28,23 +28,53 @@ def rules():
     print("insert rules string here...")
 
 
+def position_ships(setup_list):
+    """
+    Allows the user to place his ships within the defined grid.
+    """
+    print(f"Choose where to place your ships by entering their coordinates \
+seperated by commas. {setup_list}")
+
+
 def setup_newgame():
     """
-    Request input for board size and ships and passes it to new game function.
+    Request input for board size and passes it and ships to position_ships().
     """
-    print("Please define the game parameters:")
-    grid_height = int(input("Grid height (4-12): "))
-    grid_width = int(input("Grid width (4-12): "))
-    if grid_height < 4 or grid_width < 4:
-        print("The grid is too small. Width and height must be at least 4.")
-        setup_newgame()
-    elif grid_height * grid_width < 36:
-        print("Your armada contains:\n\
-        1 Battleship (length 4)\n\
-        2 Cruisers (length 3)\n\
-        2 Destroyers (length 2)")
-        print("Choose where to place your ships by entering their coordinates \
-seperated by commas.")
+    print("\nPlease define the game parameters:")
+    grid_height = int(input("Grid height (5-10): "))
+    grid_width = int(input("Grid width (5-10): "))
+    try:
+        if grid_height < 5 or grid_width < 5:
+            print("\nThe grid is too small. Both width and height must be \
+at least 5.")
+            setup_newgame()
+        elif grid_height * grid_width <= 36:
+            print("Your armada contains:\n\
+            1 Battleship (length 4)\n\
+            2 Cruisers (length 3)\n\
+            2 Destroyers (length 2)")
+            setup_list = [grid_height, grid_width, 1, 2, 2]
+            return setup_list
+        elif grid_height * grid_width <= 64:
+            print("Your armada contains:\n\
+            2 Battleships (length 4)\n\
+            3 Cruisers (length 3)\n\
+            3 Destroyers (length 2)")
+            setup_list = [grid_height, grid_width, 2, 3, 3]
+            return setup_list
+        elif grid_height * grid_width <= 100:
+            print("Your armada contains:\n\
+            3 Battleships (length 4)\n\
+            3 Cruisers (length 3)\n\
+            5 Destroyers (length 2)")
+            setup_list = [grid_height, grid_width, 3, 3, 5]
+            return setup_list
+        elif grid_height > 10 or grid_width > 10:
+            print("\nThe grid is too big. Both width and height must be \
+less than 10.")
+            setup_newgame()
+    finally:
+        position_ships(setup_list)
 
 
 def print_current_score():
