@@ -32,7 +32,19 @@ def setup_newgame():
     """
     Request input for board size and ships and passes it to new game function.
     """
-    print("newgame setup function")
+    print("Please define the game parameters:")
+    grid_height = int(input("Grid height (4-12): "))
+    grid_width = int(input("Grid width (4-12): "))
+    if grid_height < 4 or grid_width < 4:
+        print("The grid is too small. Width and height must be at least 4.")
+        setup_newgame()
+    elif grid_height * grid_width < 36:
+        print("Your armada contains:\n\
+        1 Battleship (length 4)\n\
+        2 Cruisers (length 3)\n\
+        2 Destroyers (length 2)")
+        print("Choose where to place your ships by entering their coordinates \
+seperated by commas.")
 
 
 def print_current_score():
