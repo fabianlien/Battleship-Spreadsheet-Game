@@ -29,22 +29,34 @@ def rules():
     print("insert rules string here...")
 
 
-def grid_setup(setup_list):
+def position_ships(setup_list):
     """
     Allows the user to place his ships within the defined grid.
     """
     grid_cols = [' ' for i in range(setup_list[0])]
     for i in range(setup_list[1]):
         print(grid_cols)
-    print("Choose where to place your ships by entering their coordinates \
-seperated by commas.")
+    print("Place your ships by entering the coordinate for the front of each \
+ship.")
 
     for i in range(setup_list[2]):
-        input("Place your Battleship: ")
+        coordinate = input("Place your Battleship: ")
+        let = coordinate[0]
+        num = coordinate[1]
+        for cell in range(4):
+            PLAYER_BOARD.update_acell(let.upper() + str(int(num) + cell), "B")
     for i in range(setup_list[3]):
-        input("Place your Cruiser: ")
+        coordinate = input("Place your Cruiser: ")
+        let = coordinate[0]
+        num = coordinate[1]
+        for cell in range(3):
+            PLAYER_BOARD.update_acell(let.upper() + str(int(num) + cell), "C")
     for i in range(setup_list[3]):
-        input("Place your Destroyer: ")
+        coordinate = input("Place your Destroyer: ")
+        let = coordinate[0]
+        num = coordinate[1]
+        for cell in range(2):
+            PLAYER_BOARD.update_acell(let.upper() + str(int(num) + cell), "D")
 
 
 def setup_newgame():
@@ -73,7 +85,7 @@ at least 5.")
             3 Destroyers (length 2)")
             setup_list = [grid_height, grid_width, 2, 3, 3]
             return setup_list
-        elif grid_height * grid_width <= 100:
+        elif grid_height * grid_width < 99:
             print("Your armada contains:\n\
             3 Battleships (length 4)\n\
             3 Cruisers (length 3)\n\
@@ -85,7 +97,7 @@ at least 5.")
 less than 10.")
             setup_newgame()
     finally:
-        grid_setup(setup_list)
+        position_ships(setup_list)
 
 
 def print_current_score():
