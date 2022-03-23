@@ -1,6 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 from pprint import pprint
+import random
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -30,16 +31,25 @@ def rules():
     print("insert rules string here...")
 
 
-def position_ships(setup_list):
+def setup_grid(setup_list, user):
     """
-    First clears the board,
-    then allows the user to place his ships within the defined grid.
+    Clears the board, then adds a new grid,
+    Pprints the grid if initiated by PLAYER.
     """
-    PLAYER.clear()
+    user.clear()
     set_cols = ["." for x in range(setup_list[1])]
     set_grid = [set_cols for x in range(setup_list[0])]
-    PLAYER.append_rows(set_grid)
-    pprint(PLAYER.get_all_values())
+    user.append_rows(set_grid)
+    if user == "PLAYER":
+        pprint(user.get_all_values())
+
+
+def position_ships(setup_list):
+    """
+    First calls the setup grid function,
+    then allows the user to place his ships within the defined grid.
+    """
+    setup_grid(setup_list, PLAYER)
 
     print("Place your ships by entering the coordinate for the front of each \
 ship.")
@@ -51,10 +61,10 @@ ship.")
             if PLAYER.acell(let.upper() + str(int(num)+cell)).value == ".":
                 PLAYER.update_acell(let.upper() + str(int(num)+cell), "B")
             elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
-                print("You cannot place a ship outside of the game grid.")
+                print("You cannot place a ship outside of the game grid\n.")
                 position_ships(setup_list)
             else:
-                print("You cannot place a ship on another ship.")
+                print("You cannot place a ship on another ship.\n")
                 position_ships(setup_list)
         pprint(PLAYER.get_all_values())
 
@@ -66,10 +76,10 @@ ship.")
             if PLAYER.acell(let.upper() + str(int(num) + cell)).value == ".":
                 PLAYER.update_acell(let.upper() + str(int(num) + cell), "C")
             elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
-                print("You cannot place a ship outside of the game grid.")
+                print("You cannot place a ship outside of the game grid.\n")
                 position_ships(setup_list)
             else:
-                print("You cannot place a ship on another ship.")
+                print("You cannot place a ship on another ship.\n")
                 position_ships(setup_list)
         pprint(PLAYER.get_all_values())
 
@@ -81,12 +91,21 @@ ship.")
             if PLAYER.acell(let.upper() + str(int(num) + cell)).value == ".":
                 PLAYER.update_acell(let.upper() + str(int(num) + cell), "D")
             elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
-                print("You cannot place a ship outside of the game grid.")
+                print("You cannot place a ship outside of the game grid.\n")
                 position_ships(setup_list)
             else:
-                print("You cannot place a ship on another ship.")
+                print("You cannot place a ship on another ship.\n")
                 position_ships(setup_list)
         pprint(PLAYER.get_all_values())
+
+
+def computer_pos_ships(setup_list):
+    """
+    Generates the computer grid and places ships randomly.
+    """
+    setup_grid(setup_list, COMPUTER)
+    rand_num = random.randint(0, setup_list[0])
+    print(rand_num)
 
 
 def setup_newgame():
@@ -157,7 +176,8 @@ def validate_input(input_value):
     if input_value.lower() == "rules":
         rules()
     elif input_value.lower() == "newgame":
-        setup_newgame()
+        setup_list = setup_newgame()
+        return setup_list
     elif input_value.lower() == "score":
         print_current_score()
     elif input_value.lower() == "forfeit":
@@ -166,4 +186,12 @@ def validate_input(input_value):
         raise ValueError(f"Unknown command {input_value}")
 
 
-validate_input(input_command)
+def main():
+    """
+    Run all program functions
+    """
+    setup = validate_input(input_command)
+    computer_pos_ships(setup)
+
+
+main()
