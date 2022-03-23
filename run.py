@@ -1,5 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
+from pprint import pprint
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -11,8 +12,8 @@ CREDS = Credentials.from_service_account_file('creds.json')
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('battleship')
-PLAYER_BOARD = SHEET.worksheet('player_board')
-COMPUTER_BOARD = SHEET.worksheet('computer_board')
+PLAYER = SHEET.worksheet('player_board')
+COMPUTER = SHEET.worksheet('computer_board')
 
 
 print('Welcome to "Battleship"')
@@ -31,32 +32,61 @@ def rules():
 
 def position_ships(setup_list):
     """
-    Allows the user to place his ships within the defined grid.
+    First clears the board,
+    then allows the user to place his ships within the defined grid.
     """
-    grid_cols = [' ' for i in range(setup_list[0])]
-    for i in range(setup_list[1]):
-        print(grid_cols)
+    PLAYER.clear()
+    set_cols = ["." for x in range(setup_list[1])]
+    set_grid = [set_cols for x in range(setup_list[0])]
+    PLAYER.append_rows(set_grid)
+    pprint(PLAYER.get_all_values())
+
     print("Place your ships by entering the coordinate for the front of each \
 ship.")
-
     for i in range(setup_list[2]):
         coordinate = input("Place your Battleship: ")
         let = coordinate[0]
         num = coordinate[1]
         for cell in range(4):
-            PLAYER_BOARD.update_acell(let.upper() + str(int(num) + cell), "B")
+            if PLAYER.acell(let.upper() + str(int(num)+cell)).value == ".":
+                PLAYER.update_acell(let.upper() + str(int(num)+cell), "B")
+            elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
+                print("You cannot place a ship outside of the game grid.")
+                position_ships(setup_list)
+            else:
+                print("You cannot place a ship on another ship.")
+                position_ships(setup_list)
+        pprint(PLAYER.get_all_values())
+
     for i in range(setup_list[3]):
         coordinate = input("Place your Cruiser: ")
         let = coordinate[0]
         num = coordinate[1]
         for cell in range(3):
-            PLAYER_BOARD.update_acell(let.upper() + str(int(num) + cell), "C")
+            if PLAYER.acell(let.upper() + str(int(num) + cell)).value == ".":
+                PLAYER.update_acell(let.upper() + str(int(num) + cell), "C")
+            elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
+                print("You cannot place a ship outside of the game grid.")
+                position_ships(setup_list)
+            else:
+                print("You cannot place a ship on another ship.")
+                position_ships(setup_list)
+        pprint(PLAYER.get_all_values())
+
     for i in range(setup_list[3]):
         coordinate = input("Place your Destroyer: ")
         let = coordinate[0]
         num = coordinate[1]
         for cell in range(2):
-            PLAYER_BOARD.update_acell(let.upper() + str(int(num) + cell), "D")
+            if PLAYER.acell(let.upper() + str(int(num) + cell)).value == ".":
+                PLAYER.update_acell(let.upper() + str(int(num) + cell), "D")
+            elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
+                print("You cannot place a ship outside of the game grid.")
+                position_ships(setup_list)
+            else:
+                print("You cannot place a ship on another ship.")
+                position_ships(setup_list)
+        pprint(PLAYER.get_all_values())
 
 
 def setup_newgame():
