@@ -14,6 +14,7 @@ SHEET = GSPREAD_CLIENT.open('battleship')
 PLAYER_BOARD = SHEET.worksheet('player_board')
 COMPUTER_BOARD = SHEET.worksheet('computer_board')
 
+
 print('Welcome to "Battleship"')
 print("The classic World War 1 game, running directly in your terminal!\n")
 print('Type one of the following commands below and hit enter:\
@@ -28,12 +29,22 @@ def rules():
     print("insert rules string here...")
 
 
-def position_ships(setup_list):
+def grid_setup(setup_list):
     """
     Allows the user to place his ships within the defined grid.
     """
-    print(f"Choose where to place your ships by entering their coordinates \
-seperated by commas. {setup_list}")
+    grid_cols = [' ' for i in range(setup_list[0])]
+    for i in range(setup_list[1]):
+        print(grid_cols)
+    print("Choose where to place your ships by entering their coordinates \
+seperated by commas.")
+
+    for i in range(setup_list[2]):
+        input("Place your Battleship: ")
+    for i in range(setup_list[3]):
+        input("Place your Cruiser: ")
+    for i in range(setup_list[3]):
+        input("Place your Destroyer: ")
 
 
 def setup_newgame():
@@ -74,7 +85,7 @@ at least 5.")
 less than 10.")
             setup_newgame()
     finally:
-        position_ships(setup_list)
+        grid_setup(setup_list)
 
 
 def print_current_score():
