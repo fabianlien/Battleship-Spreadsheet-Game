@@ -2,6 +2,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from pprint import pprint
 import random
+import string
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -17,11 +18,21 @@ PLAYER = SHEET.worksheet('player_board')
 COMPUTER = SHEET.worksheet('computer_board')
 
 
-print('Welcome to "Battleship"')
-print("The classic World War 1 game, running directly in your terminal!\n")
-print('Type one of the following commands below and hit enter:\
-  "Rules",  "NewGame",  "Score",  "Forfeit"')
-input_command = input("Enter command: ")
+def start_menu():
+    """
+    Prints the welcome message and input options on
+    when file is first excecuted.
+    """
+    while True:
+        print('Welcome to "Battleship"')
+        print("The classic World War 1 game, running in your terminal!\n")
+        print('Type one of the following commands below and hit enter:\
+    "Rules",  "NewGame",  "Score",  "Forfeit"')
+        input_command = input("Enter command: ")
+
+        if validate_menu_input(input_command):
+            break
+    return input_command
 
 
 def rules():
@@ -106,6 +117,8 @@ def computer_pos_ships(setup_list):
     setup_grid(setup_list, COMPUTER)
     rand_num = random.randint(0, setup_list[0])
     print(rand_num)
+    rand_let = string.ascii_letters[random.randint(0, setup_list[1])]
+    print(rand_let)
 
 
 def setup_newgame():
@@ -169,28 +182,37 @@ def forfeit_y_n():
         raise ValueError(f"{option} is not a valid answer.")
 
 
-def validate_input(input_value):
+def validate_menu_input(input_value):
     """
     makes all string data lower case and raises valueError if invalid data.
     """
-    if input_value.lower() == "rules":
-        rules()
-    elif input_value.lower() == "newgame":
-        setup_list = setup_newgame()
-        return setup_list
-    elif input_value.lower() == "score":
-        print_current_score()
-    elif input_value.lower() == "forfeit":
-        forfeit_y_n()
-    else:
-        raise ValueError(f"Unknown command {input_value}")
+    try:
+        if input_value.lower() not in ["rules", "newgame", "score", "forfeit"]:
+            raise ValueError(
+                f"You must enter 1 of the 4 commands listed above.\
+You entered {input_value}."
+            )
+    except ValueError as e:
+        print(f"Invalid input: {e}, please try again.\n")
+        return False
+    return True
 
 
 def main():
     """
     Run all program functions
     """
-    setup = validate_input(input_command)
+    start_menu_input = start_menu()
+    setup = validate_menu_input(start_menu_input)
+    if start_menu_input == "rules":
+        rules()
+    elif start_menu_input == "newgame":
+        setup_list = setup_newgame()
+        return setup_list
+    elif start_menu_input == "score":
+        print_current_score()
+    elif start_menu_input == "forfeit":
+        forfeit_y_n()
     computer_pos_ships(setup)
 
 
