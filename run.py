@@ -10,12 +10,13 @@ SCOPE = [
     "https://www.googleapis.com/auth/drive"
     ]
 
-CREDS = Credentials.from_service_account_file('creds.json')
+CREDS = Credentials.from_service_account_file("creds.json")
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
-SHEET = GSPREAD_CLIENT.open('battleship')
-PLAYER = SHEET.worksheet('player_board')
-COMPUTER = SHEET.worksheet('computer_board')
+SHEET = GSPREAD_CLIENT.open("battleship")
+PLAYER = SHEET.worksheet("player_board")
+COMPUTER = SHEET.worksheet("computer_board")
+HIT_MAP = SHEET.worksheet("hit_board")
 
 
 def validate_menu_input(input_value):
@@ -65,10 +66,29 @@ def validate_coordinate(coordinate, cell):
             raise RuntimeError(
                 f"{coordinate}. It should be a letter followed by a number"
                 )
-        if PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
+        elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
             raise RuntimeError("You cannot place a ship outside of the grid")
         elif PLAYER.acell(let.upper() + str(int(num)+cell)).value != ".":
             raise RuntimeError("You canot place a ship on another ship")
+    except RuntimeError as e:
+        print(f"\n\nInavlid coordinate selected: {e}, please try again.\n")
+        return False
+    return True
+
+
+def validate_strike_coord(coordinate):
+    """
+    Validates the input coordinates when firing.
+    """
+    let = coordinate[0]
+    num = coordinate[1]
+    try:
+        if len(coordinate) != 2:
+            raise RuntimeError(
+                f"{coordinate}. It should be a letter followed by a number"
+                )
+        elif COMPUTER.acell(let.upper() + str(int(num))).value is None:
+            raise RuntimeError("You cannot fire outside of the grid")
     except RuntimeError as e:
         print(f"\n\nInavlid coordinate selected: {e}, please try again.\n")
         return False
@@ -146,9 +166,10 @@ def random_coordinate(grid_width, grid_height, ship_length):
 
 def computer_pos_ships(setup_list):
     """
-    First generates the computer grid, then places ships randomly.
+    First generates the computer and hit map grids, then places ships randomly.
     """
     setup_grid(setup_list, COMPUTER)
+    setup_grid(setup_list, HIT_MAP)
     ship_length = 4
 
     for i in range(3):
@@ -207,6 +228,35 @@ def continue_game():
     """
     Gets the current game from the sheet and resumes the players turn.
     """
+    pprint(HIT_MAP.get_all_values())
+    coord = input("Your turn. Enter Coordinate: ")
+    if validate_strike_coord(coord):
+        cell = coord[0].upper() + str(int(coord[1]))
+        if COMPUTER.acell(cell).value == ".":
+            COMPUTER.update_acell(cell, "X")
+            HIT_MAP.update_acell(cell, "o")
+            print(f"\n{cell} was a miss!\n")
+        elif COMPUTER.acell(cell).value == "X":
+            print("You have already fired there... Too bad.")
+        else:
+            COMPUTER.update_acell(cell, "X")
+            HIT_MAP.update_acell(cell, "X")
+            print(f"\n{cell} was a hit!\n")
+        pprint(HIT_MAP.get_all_values())
+        rand_cell = random_coordinate(5, 5, 1)
+        while PLAYER.acell(rand_cell).value == "X":
+            rand_cell = random_coordinate(5, 5, 1)
+        if PLAYER.acell(rand_cell).value == ".":
+            PLAYER.update_acell(rand_cell, "X")
+            print(f"\nComputer fired at {rand_cell} and missed!\n")
+        else:
+            PLAYER.update_acell(rand_cell, "X")
+            print(f"\nComputer fired at {rand_cell} and hit!\n")
+        pprint(PLAYER.get_all_values())
+    else:
+        continue_game()
+    #add validator to see if game is over.
+    continue_game()
 
 
 def forfeit_y_n():
@@ -233,12 +283,13 @@ def main():
         rules()
     elif start_menu_input == "newgame":
         setup_list = setup_newgame()
-    elif start_menu_input == "Continue":
+    elif start_menu_input == "continue":
         continue_game()
     elif start_menu_input == "forfeit":
         forfeit_y_n()
     computer_pos_ships(setup_list)
     position_ships(setup_list)
+    continue_game()
 
 
 main()
