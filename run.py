@@ -49,7 +49,27 @@ def validate_grid_len(height, width):
     except ValueError as e:
         print(f"\n\nInvalid input: {e}, please try again.\n")
         return False
+    return True
 
+
+def validate_coordinate(coordinate, cell):
+    """
+    Validates the input coordinates when placing ships.
+    """
+    let = coordinate[0]
+    num = coordinate[1]
+    try:
+        if len(coordinate) != 2:
+            raise RuntimeError(
+                f"{coordinate}. It should be a letter followed by a number"
+                )
+        if PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
+            raise RuntimeError("You cannot place a ship outside of the grid")
+        elif PLAYER.acell(let.upper() + str(int(num)+cell)).value != ".":
+            raise RuntimeError("You canot place a ship on another ship")
+    except RuntimeError as e:
+        print(f"\n\nInavlid coordinate selected: {e}, please try again.\n")
+        return False
     return True
 
 
@@ -95,9 +115,28 @@ def position_ships(setup_list):
     then allows the user to place his ships within the defined grid.
     """
     setup_grid(setup_list, PLAYER)
+    print("Place your ships by entering the coordinate for the front of \
+each ship.")
+    for i in range(2, 5):
+        for x in range(setup_list[newgami]):
+            ship_type = {"Battleship": 2, "Cruiser": 3, "Destroyer": 4}
+            coordinate = input(f"Place your {i}: ")
+            for cell in range(4):
+                if validate_coordinate(coordinate, cell):
+                    let = coordinate[0]
+                    num = coordinate[1]
+                    PLAYER.update_acell(let.upper() + str(int(num)+cell), "B")
+                else:
+                    position_ships(setup_list)
+            pprint(PLAYER.get_all_values())
 
-    print("Place your ships by entering the coordinate for the front of each \
-ship.")
+
+
+
+
+
+
+
     for i in range(setup_list[2]):
         coordinate = input("Place your Battleship: ")
         let = coordinate[0]
