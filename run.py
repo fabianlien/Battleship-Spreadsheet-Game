@@ -18,6 +18,41 @@ PLAYER = SHEET.worksheet('player_board')
 COMPUTER = SHEET.worksheet('computer_board')
 
 
+def validate_menu_input(input_value):
+    """
+    makes all string data lower case and raises valueError if invalid data.
+    """
+    try:
+        if input_value.lower() not in ["rules", "newgame", "score", "forfeit"]:
+            raise ValueError(f"You must enter 1 of the 4 commands listed above. \
+You entered {input_value}")
+    except ValueError as e:
+        print(f"\n\nInvalid input: {e}, please try again.\n")
+        return False
+    return True
+
+
+def validate_grid_len(height, width):
+    """
+    Turns input from calling function to an integer and checks it value.
+    """
+    try:
+#        if isinstance(height, int) or isinstance(width, int) is False:
+#            raise TypeError("The grid can only be comprised of numbers")
+        if int(height) < 5 or int(width) < 5:
+            raise ValueError("Your grid must be at least 5*5")
+        elif int(height) > 10 or int(width) > 10:
+            raise ValueError("Your grid can at most be 10*10")
+#    except TypeError as e:
+#        print(f"\n\nInvalid data type: {e}, please try again.\n")
+#        return False
+    except ValueError as e:
+        print(f"\n\nInvalid input: {e}, please try again.\n")
+        return False
+
+    return True
+
+
 def start_menu():
     """
     Prints the welcome message and input options on
@@ -29,10 +64,9 @@ def start_menu():
         print('Type one of the following commands below and hit enter:\
     "Rules",  "NewGame",  "Score",  "Forfeit"')
         input_command = input("Enter command: ")
-
         if validate_menu_input(input_command):
             break
-    return input_command
+    return input_command.lower()
 
 
 def rules():
@@ -125,41 +159,35 @@ def setup_newgame():
     """
     Request input for board size and passes it and ships to position_ships().
     """
-    print("\nPlease define the game parameters:")
-    grid_height = int(input("Grid height (5-10): "))
-    grid_width = int(input("Grid width (5-10): "))
-    try:
-        if grid_height < 5 or grid_width < 5:
-            print("\nThe grid is too small. Both width and height must be \
-at least 5.")
-            setup_newgame()
-        elif grid_height * grid_width <= 36:
-            print("Your armada contains:\n\
-            1 Battleship (length 4)\n\
-            2 Cruisers (length 3)\n\
-            2 Destroyers (length 2)")
-            setup_list = [grid_height, grid_width, 1, 2, 2]
-            return setup_list
-        elif grid_height * grid_width <= 64:
-            print("Your armada contains:\n\
-            2 Battleships (length 4)\n\
-            3 Cruisers (length 3)\n\
-            3 Destroyers (length 2)")
-            setup_list = [grid_height, grid_width, 2, 3, 3]
-            return setup_list
-        elif grid_height * grid_width < 99:
-            print("Your armada contains:\n\
-            3 Battleships (length 4)\n\
-            3 Cruisers (length 3)\n\
-            5 Destroyers (length 2)")
-            setup_list = [grid_height, grid_width, 3, 3, 5]
-            return setup_list
-        elif grid_height > 10 or grid_width > 10:
-            print("\nThe grid is too big. Both width and height must be \
-less than 10.")
-            setup_newgame()
-    finally:
-        position_ships(setup_list)
+    while True:
+        print("\nPlease define the game parameters:")
+        grid_height = input("Grid height (5-10): ")
+        grid_width = input("Grid width (5-10): ")
+        if validate_grid_len(grid_height, grid_width):
+            break
+    grid_height = int(grid_height)
+    grid_width = int(grid_width)
+    if grid_height * grid_width <= 36:
+        print("Your armada contains:\n\
+        1 Battleship (length 4)\n\
+        2 Cruisers (length 3)\n\
+        2 Destroyers (length 2)")
+        setup_list = [grid_height, grid_width, 1, 2, 2]
+        return setup_list
+    elif grid_height * grid_width <= 64:
+        print("Your armada contains:\n\
+        2 Battleships (length 4)\n\
+        3 Cruisers (length 3)\n\
+        3 Destroyers (length 2)")
+        setup_list = [grid_height, grid_width, 2, 3, 3]
+        return setup_list
+    elif grid_height * grid_width < 99:
+        print("Your armada contains:\n\
+        3 Battleships (length 4)\n\
+        3 Cruisers (length 3)\n\
+        5 Destroyers (length 2)")
+        setup_list = [grid_height, grid_width, 3, 3, 5]
+        return setup_list
 
 
 def print_current_score():
@@ -182,38 +210,22 @@ def forfeit_y_n():
         raise ValueError(f"{option} is not a valid answer.")
 
 
-def validate_menu_input(input_value):
-    """
-    makes all string data lower case and raises valueError if invalid data.
-    """
-    try:
-        if input_value.lower() not in ["rules", "newgame", "score", "forfeit"]:
-            raise ValueError(
-                f"You must enter 1 of the 4 commands listed above.\
-You entered {input_value}."
-            )
-    except ValueError as e:
-        print(f"Invalid input: {e}, please try again.\n")
-        return False
-    return True
-
-
 def main():
     """
     Run all program functions
     """
     start_menu_input = start_menu()
-    setup = validate_menu_input(start_menu_input)
+    validate_menu_input(start_menu_input)
     if start_menu_input == "rules":
         rules()
     elif start_menu_input == "newgame":
         setup_list = setup_newgame()
-        return setup_list
     elif start_menu_input == "score":
         print_current_score()
     elif start_menu_input == "forfeit":
         forfeit_y_n()
-    computer_pos_ships(setup)
+    position_ships(setup_list)
+    computer_pos_ships(setup_list)
 
 
 main()
