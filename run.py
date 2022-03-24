@@ -134,14 +134,14 @@ each ship.")
             pprint(PLAYER.get_all_values())
 
 
-def random_coordinate(grid_width, grid_height):
+def random_coordinate(grid_width, grid_height, ship_length):
     """
     Generates a random coordinate based on grid dimensions.
     """
-    rand_num = random.randint(1, grid_height)
-    rand_let = string.ascii_letters[random.randint(1, grid_width)]
-    rand_coord = rand_let + str(rand_num)
-    print(rand_coord)
+    rand_num = random.randint(1, (grid_height - ship_length + 1))
+    rand_let = string.ascii_letters[random.randint(1, grid_width - 1)]
+    rand_coord = rand_let.upper() + str(rand_num)
+    return rand_coord
 
 
 def computer_pos_ships(setup_list):
@@ -149,7 +149,33 @@ def computer_pos_ships(setup_list):
     First generates the computer grid, then places ships randomly.
     """
     setup_grid(setup_list, COMPUTER)
-    random_coordinate(setup_list[0], setup_list[1])
+    ship_length = 4
+
+    for i in range(3):
+        r_c = random_coordinate(setup_list[0], setup_list[1], ship_length)
+        print(r_c)
+        if COMPUTER.acell(r_c).value == ".":
+            for x in range(ship_length):
+                COMPUTER.update_acell((r_c[0].upper() + str(int(r_c[1])+x)), "B")
+
+
+    #for i in range(2, 5):
+    #    for x in range(setup_list[i]):
+    #        ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
+    #        ship_length = {2: 4, 3: 3, 4: 2}
+    #        r_c = random_coordinate(setup_list[0], setup_list[1])
+    #        for cell in range(ship_length[i]):
+    #            if COMPUTER.acell(r_c[0].upper() + str(int(r_c[1])+cell)).value == ".":
+    #                update = r_c[0].upper() + str(int(r_c[1])+cell)
+    #                COMPUTER.update_acell(update, ship_type[i][0])
+    #            else:
+    #                random_coordinate(setup_list[0], setup_list[1])
+
+    #COMPUTER.update_acell(r_c[0].upper() + str(int(r_c[1])+cell), ship_type[i][0])
+                #update = r_c[0].upper() + str(int(r_c[1])+cell)
+                #COMPUTER.update_acell(update, ship_type[i][0])
+
+    print("Computer Ready!")
 
 
 def setup_newgame():
@@ -211,8 +237,8 @@ def main():
         continue_game()
     elif start_menu_input == "forfeit":
         forfeit_y_n()
-    position_ships(setup_list)
     computer_pos_ships(setup_list)
+    position_ships(setup_list)
 
 
 main()
