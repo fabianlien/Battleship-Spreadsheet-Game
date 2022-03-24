@@ -23,7 +23,8 @@ def validate_menu_input(input_value):
     makes all string data lower case and raises valueError if invalid data.
     """
     try:
-        if input_value.lower() not in ["rules", "newgame", "score", "forfeit"]:
+        options_list = ["rules", "newgame", "continue", "forfeit"]
+        if input_value.lower() not in options_list:
             raise ValueError(f"You must enter 1 of the 4 commands listed above. \
 You entered {input_value}")
     except ValueError as e:
@@ -37,19 +38,20 @@ def validate_grid_len(height, width):
     Turns input from calling function to an integer and checks it value.
     """
     try:
-#        if isinstance(height, int) or isinstance(width, int) is False:
-#            raise TypeError("The grid can only be comprised of numbers")
-        if int(height) < 5 or int(width) < 5:
-            raise ValueError("Your grid must be at least 5*5")
-        elif int(height) > 10 or int(width) > 10:
-            raise ValueError("Your grid can at most be 10*10")
-#    except TypeError as e:
-#        print(f"\n\nInvalid data type: {e}, please try again.\n")
-#        return False
-    except ValueError as e:
-        print(f"\n\nInvalid input: {e}, please try again.\n")
+        valid_height = int(height)
+        valid_width = int(width)
+        valid_height_coordinate = (valid_height > 4) and (valid_height < 10)
+        valid_width_coordinate = (valid_width > 4) and (valid_width < 10)
+        if valid_height_coordinate and valid_width_coordinate:
+            return True
+        else:
+            error_message = "Your grid must be at least 5*5 and 9*9 at most"
+            print(f"\nInvalid data type: {error_message}, please try again.\n")
+            return False
+    except ValueError:
+        error_message = "The grid can only be comprised of numbers"
+        print(f"\n\nInvalid data type: {error_message}, please try again.\n")
         return False
-    return True
 
 
 def validate_coordinate(coordinate, cell):
@@ -82,7 +84,7 @@ def start_menu():
         print('Welcome to "Battleship"')
         print("The classic World War 1 game, running in your terminal!\n")
         print('Type one of the following commands below and hit enter:\
-    "Rules",  "NewGame",  "Score",  "Forfeit"')
+    "Rules",  "NewGame",  "Continue",  "Forfeit"')
         input_command = input("Enter command: ")
         if validate_menu_input(input_command):
             break
@@ -122,25 +124,32 @@ each ship.")
         for x in range(setup_list[i]):
             ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
             ship_length = {2: 4, 3: 3, 4: 2}
-            coordinate = input(f"Place your {ship_type[i]}: ")
+            coord = input(f"Place your {ship_type[i]}: ")
             for cell in range(ship_length[i]):
-                if validate_coordinate(coordinate, cell):
-                    (PLAYER.update_acell
-(coordinate[0].upper() + str(int(coordinate[1])+cell), ship_type[i][0]))
+                if validate_coordinate(coord, cell):
+                    update = coord[0].upper() + str(int(coord[1])+cell)
+                    PLAYER.update_acell(update, ship_type[i][0])
                 else:
                     position_ships(setup_list)
             pprint(PLAYER.get_all_values())
 
 
+def random_coordinate(grid_width, grid_height):
+    """
+    Generates a random coordinate based on grid dimensions.
+    """
+    rand_num = random.randint(1, grid_height)
+    rand_let = string.ascii_letters[random.randint(1, grid_width)]
+    rand_coord = rand_let + str(rand_num)
+    print(rand_coord)
+
+
 def computer_pos_ships(setup_list):
     """
-    Generates the computer grid and places ships randomly.
+    First generates the computer grid, then places ships randomly.
     """
     setup_grid(setup_list, COMPUTER)
-    rand_num = random.randint(0, setup_list[0])
-    print(rand_num)
-    rand_let = string.ascii_letters[random.randint(0, setup_list[1])]
-    print(rand_let)
+    random_coordinate(setup_list[0], setup_list[1])
 
 
 def setup_newgame():
@@ -149,38 +158,28 @@ def setup_newgame():
     """
     while True:
         print("\nPlease define the game parameters:")
-        grid_height = input("Grid height (5-10): ")
-        grid_width = input("Grid width (5-10): ")
+        grid_height = input("Grid height (5-9): ")
+        grid_width = input("Grid width (5-9): ")
         if validate_grid_len(grid_height, grid_width):
             break
     grid_height = int(grid_height)
     grid_width = int(grid_width)
-    if grid_height * grid_width <= 36:
-        print("Your armada contains:\n\
-        1 Battleship (length 4)\n\
-        2 Cruisers (length 3)\n\
-        2 Destroyers (length 2)")
-        setup_list = [grid_height, grid_width, 1, 2, 2]
-        return setup_list
-    elif grid_height * grid_width <= 64:
-        print("Your armada contains:\n\
-        2 Battleships (length 4)\n\
-        3 Cruisers (length 3)\n\
-        3 Destroyers (length 2)")
-        setup_list = [grid_height, grid_width, 2, 3, 3]
-        return setup_list
-    elif grid_height * grid_width < 99:
-        print("Your armada contains:\n\
-        3 Battleships (length 4)\n\
-        3 Cruisers (length 3)\n\
-        5 Destroyers (length 2)")
-        setup_list = [grid_height, grid_width, 3, 3, 5]
-        return setup_list
+    num_l = [[36, 1, 1, 2], [64, 2, 3, 3], [81, 3, 3, 5]]
+    for i in range(3):
+        if grid_height * grid_width <= num_l[i][0]:
+            print(f"Your armada contains:\n\
+            {num_l[i][1]} Battleships (length 4)\n\
+            {num_l[i][2]} Cruisers (length 3)\n\
+            {num_l[i][3]} Destroyers (length 2)")
+            setup_list = [
+                grid_height, grid_width, num_l[i][1], num_l[i][2], num_l[i][3]
+                ]
+            return setup_list
 
 
-def print_current_score():
+def continue_game():
     """
-    Print current scores to terminal.
+    Gets the current game from the sheet and resumes the players turn.
     """
 
 
@@ -208,8 +207,8 @@ def main():
         rules()
     elif start_menu_input == "newgame":
         setup_list = setup_newgame()
-    elif start_menu_input == "score":
-        print_current_score()
+    elif start_menu_input == "Continue":
+        continue_game()
     elif start_menu_input == "forfeit":
         forfeit_y_n()
     position_ships(setup_list)
