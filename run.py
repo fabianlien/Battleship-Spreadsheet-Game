@@ -113,74 +113,23 @@ def position_ships(setup_list):
     """
     First calls the setup grid function,
     then allows the user to place his ships within the defined grid.
+    If an error is caught, restarts the whole function.
     """
     setup_grid(setup_list, PLAYER)
     print("Place your ships by entering the coordinate for the front of \
 each ship.")
     for i in range(2, 5):
-        for x in range(setup_list[newgami]):
-            ship_type = {"Battleship": 2, "Cruiser": 3, "Destroyer": 4}
-            coordinate = input(f"Place your {i}: ")
-            for cell in range(4):
+        for x in range(setup_list[i]):
+            ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
+            ship_length = {2: 4, 3: 3, 4: 2}
+            coordinate = input(f"Place your {ship_type[i]}: ")
+            for cell in range(ship_length[i]):
                 if validate_coordinate(coordinate, cell):
-                    let = coordinate[0]
-                    num = coordinate[1]
-                    PLAYER.update_acell(let.upper() + str(int(num)+cell), "B")
+                    (PLAYER.update_acell
+(coordinate[0].upper() + str(int(coordinate[1])+cell), ship_type[i][0]))
                 else:
                     position_ships(setup_list)
             pprint(PLAYER.get_all_values())
-
-
-
-
-
-
-
-
-    for i in range(setup_list[2]):
-        coordinate = input("Place your Battleship: ")
-        let = coordinate[0]
-        num = coordinate[1]
-        for cell in range(4):
-            if PLAYER.acell(let.upper() + str(int(num)+cell)).value == ".":
-                PLAYER.update_acell(let.upper() + str(int(num)+cell), "B")
-            elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
-                print("You cannot place a ship outside of the game grid\n.")
-                position_ships(setup_list)
-            else:
-                print("You cannot place a ship on another ship.\n")
-                position_ships(setup_list)
-        pprint(PLAYER.get_all_values())
-
-    for i in range(setup_list[3]):
-        coordinate = input("Place your Cruiser: ")
-        let = coordinate[0]
-        num = coordinate[1]
-        for cell in range(3):
-            if PLAYER.acell(let.upper() + str(int(num) + cell)).value == ".":
-                PLAYER.update_acell(let.upper() + str(int(num) + cell), "C")
-            elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
-                print("You cannot place a ship outside of the game grid.\n")
-                position_ships(setup_list)
-            else:
-                print("You cannot place a ship on another ship.\n")
-                position_ships(setup_list)
-        pprint(PLAYER.get_all_values())
-
-    for i in range(setup_list[3]):
-        coordinate = input("Place your Destroyer: ")
-        let = coordinate[0]
-        num = coordinate[1]
-        for cell in range(2):
-            if PLAYER.acell(let.upper() + str(int(num) + cell)).value == ".":
-                PLAYER.update_acell(let.upper() + str(int(num) + cell), "D")
-            elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
-                print("You cannot place a ship outside of the game grid.\n")
-                position_ships(setup_list)
-            else:
-                print("You cannot place a ship on another ship.\n")
-                position_ships(setup_list)
-        pprint(PLAYER.get_all_values())
 
 
 def computer_pos_ships(setup_list):
