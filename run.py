@@ -142,6 +142,18 @@ def rules():
     print("insert rules string here...")
 
 
+def overwrite_current_game():
+    """
+    Checks if the user wants to overwrite the current game and validates input.
+    """
+    if COMPUTER.get_all_values() != []:
+        print("\nStarting a new game will overwrite your current game")
+        input_val = input("Are you sure you want to proceed? Y/N: ")
+        if list(input_val)[0].lower() != "y":
+            print("\nResuming current game...")
+            continue_game()
+
+
 def setup_grid(setup_list, user):
     """
     Clears the board, then adds a new grid,
@@ -237,6 +249,7 @@ def setup_newgame():
     """
     Request input for board size and passes it and ships to position_ships().
     """
+    overwrite_current_game()
     while True:
         print("\nPlease define the game parameters:")
         grid_height = input("Grid height (5-9): ")
@@ -296,27 +309,36 @@ def computer_turn(rand_cell):
 
 def continue_game():
     """
-    Gets the current game from the spreadsheets and resumes at player's turn.
+    Gets the current game from the spreadsheets.
+    If no current game is available, asks user to start new game.
+    Resumes at player's turn.
     Plays the computer's turn, then validates if the game is over,
     and if not, function calls itself again.
     """
-    while True:
-        print("\n")
-        pprint(HIT_MAP.get_all_values())
-        cell = input("Your turn. Enter coordinate to hit: ")
-        player_turn(cell)
-        cont = check_game_resume("player")
-        if cont is False:
-            break
+    if COMPUTER.get_all_values() != []:
+        while True:
+            print("\n")
+            pprint(HIT_MAP.get_all_values())
+            cell = input("Your turn. Enter coordinate to hit: ")
+            player_turn(cell)
+            cont = check_game_resume("player")
+            if cont is False:
+                break
 
-        grid_dim = get_grid_dim()
-        rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
-        while PLAYER.acell(rand_cell).value == "X":
+            grid_dim = get_grid_dim()
             rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
-        computer_turn(rand_cell)
-        cont = check_game_resume("computer")
-        if cont is False:
-            break
+            while PLAYER.acell(rand_cell).value == "X":
+                rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
+            computer_turn(rand_cell)
+            cont = check_game_resume("computer")
+            if cont is False:
+                break
+        PLAYER.clear()
+        COMPUTER.clear()
+        HIT_MAP.clear()
+    else:
+        print("\nNo current game to resume...\nReturning to menu.\n")
+        main()
 
 
 def forfeit_y_n():
