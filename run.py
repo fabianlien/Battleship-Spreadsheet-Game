@@ -126,7 +126,8 @@ def start_menu():
     when file is first excecuted.
     """
     while True:
-        print('Welcome to "Battleship"')
+        print(RULES.acell("A16").value)
+        print("\n                Welcome to Battleship!\n")
         print("The classic World War 1 game, running in your terminal!\n")
         print('Type one of the following commands below and hit enter:\
     "Rules",    "NewGame",    "Continue"')
