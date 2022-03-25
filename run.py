@@ -154,7 +154,7 @@ each ship.")
             pprint(PLAYER.get_all_values())
 
 
-def random_coordinate(grid_width, grid_height, ship_length):
+def random_coordinate(grid_height, grid_width, ship_length):
     """
     Generates a random coordinate based on grid dimensions.
     """
@@ -162,6 +162,16 @@ def random_coordinate(grid_width, grid_height, ship_length):
     rand_let = string.ascii_letters[random.randint(1, grid_width - 1)]
     rand_coord = rand_let.upper() + str(rand_num)
     return rand_coord
+
+
+def get_grid_dim():
+    """
+    Gets the grid dimensions from the player sheet and returns as a list.
+    """
+    height = len(PLAYER.get_all_values())
+    width = len(PLAYER.get_all_values()[0])
+    grid_dim = [int(height), int(width)]
+    return grid_dim
 
 
 def computer_pos_ships(setup_list):
@@ -224,12 +234,12 @@ def setup_newgame():
             return setup_list
 
 
-def continue_game():
+def player_turn(coord):
     """
-    Gets the current game from the sheet and resumes the players turn.
+    Takes the coordinate passed and checks if the target is valid,
+    Then updates the hit map and computer sheets annd prints a message.
+    Finally pretty prints the hitmap.
     """
-    pprint(HIT_MAP.get_all_values())
-    coord = input("Your turn. Enter Coordinate: ")
     if validate_strike_coord(coord):
         cell = coord[0].upper() + str(int(coord[1]))
         if COMPUTER.acell(cell).value == ".":
@@ -242,19 +252,40 @@ def continue_game():
             COMPUTER.update_acell(cell, "X")
             HIT_MAP.update_acell(cell, "X")
             print(f"\n{cell} was a hit!\n")
-        pprint(HIT_MAP.get_all_values())
-        rand_cell = random_coordinate(5, 5, 1)
-        while PLAYER.acell(rand_cell).value == "X":
-            rand_cell = random_coordinate(5, 5, 1)
-        if PLAYER.acell(rand_cell).value == ".":
-            PLAYER.update_acell(rand_cell, "X")
-            print(f"\nComputer fired at {rand_cell} and missed!\n")
-        else:
-            PLAYER.update_acell(rand_cell, "X")
-            print(f"\nComputer fired at {rand_cell} and hit!\n")
-        pprint(PLAYER.get_all_values())
     else:
         continue_game()
+
+
+def computer_turn(rand_cell):
+    """
+    Takes the coordinate passed and updates the player sheet.
+    Prints a message then pretty prints the player's sheet.
+    """
+    if PLAYER.acell(rand_cell).value == ".":
+        PLAYER.update_acell(rand_cell, "X")
+        print(f"Computer fired at {rand_cell} and missed!\n")
+    else:
+        PLAYER.update_acell(rand_cell, "X")
+        print(f"\nComputer fired at {rand_cell} and hit!\n")
+    pprint(PLAYER.get_all_values())
+
+
+def continue_game():
+    """
+    Gets the current game from the spreadsheets and resumes at player's turn.
+    Plays the computer's turn, then validates if the game is over,
+    and if not, function calls itself again.
+    """
+    print("\n")
+    pprint(HIT_MAP.get_all_values())
+    cell = input("Your turn. Enter coordinate to hit: ")
+    player_turn(cell)
+
+    grid_dim = get_grid_dim()
+    rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
+    while PLAYER.acell(rand_cell).value == "X":
+        rand_cell = random_coordinate(5, 5, 1)
+    computer_turn(rand_cell)
     #add validator to see if game is over.
     continue_game()
 
@@ -273,7 +304,7 @@ def forfeit_y_n():
         raise ValueError(f"{option} is not a valid answer.")
 
 
-def main():
+def setup():
     """
     Run all program functions
     """
@@ -292,4 +323,5 @@ def main():
     continue_game()
 
 
-main()
+get_grid_dim()
+setup()
