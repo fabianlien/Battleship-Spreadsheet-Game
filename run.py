@@ -24,9 +24,9 @@ def validate_menu_input(input_value):
     makes all string data lower case and raises valueError if invalid data.
     """
     try:
-        options_list = ["rules", "newgame", "continue", "forfeit"]
+        options_list = ["rules", "newgame", "continue"]
         if input_value.lower() not in options_list:
-            raise ValueError(f"You must enter 1 of the 4 commands listed above. \
+            raise ValueError(f"You must enter 1 of the 3 commands listed above. \
 You entered {input_value}")
     except ValueError as e:
         print(f"\n\nInvalid input: {e}, please try again.\n")
@@ -95,6 +95,30 @@ def validate_strike_coord(coordinate):
     return True
 
 
+def check_game_resume(user):
+    """
+    Checks if any ship values from the sheet remain,
+    and if not, prints a message.
+    """
+    if user == "player":
+        if len(
+            COMPUTER.findall("B")+COMPUTER.findall("C")+COMPUTER.findall("D")
+                ) == 0:
+            print("\n_________________________________________\
+                \nYou have sunk all of the opponents ships!\
+                \nCongratulations, YOU WIN!\
+                \n_________________________________________\n\n")
+            return False
+    elif user == "computer":
+        if len(
+            PLAYER.findall("B")+PLAYER.findall("C")+PLAYER.findall("D")
+                ) == 0:
+            print("\n_________________________________________\
+                \nAll of your ships have been sunk...\nYOU LOST!\
+                \n_________________________________________\n\n")
+            return False
+
+
 def start_menu():
     """
     Prints the welcome message and input options on
@@ -104,7 +128,7 @@ def start_menu():
         print('Welcome to "Battleship"')
         print("The classic World War 1 game, running in your terminal!\n")
         print('Type one of the following commands below and hit enter:\
-    "Rules",  "NewGame",  "Continue",  "Forfeit"')
+    "Rules",    "NewGame",    "Continue"')
         input_command = input("Enter command: ")
         if validate_menu_input(input_command):
             break
@@ -159,7 +183,7 @@ def random_coordinate(grid_height, grid_width, ship_length):
     Generates a random coordinate based on grid dimensions.
     """
     rand_num = random.randint(1, (grid_height - ship_length + 1))
-    rand_let = string.ascii_letters[random.randint(1, grid_width - 1)]
+    rand_let = string.ascii_letters[random.randint(1, grid_width) - 1]
     rand_coord = rand_let.upper() + str(rand_num)
     return rand_coord
 
@@ -276,18 +300,23 @@ def continue_game():
     Plays the computer's turn, then validates if the game is over,
     and if not, function calls itself again.
     """
-    print("\n")
-    pprint(HIT_MAP.get_all_values())
-    cell = input("Your turn. Enter coordinate to hit: ")
-    player_turn(cell)
+    while True:
+        print("\n")
+        pprint(HIT_MAP.get_all_values())
+        cell = input("Your turn. Enter coordinate to hit: ")
+        player_turn(cell)
+        cont = check_game_resume("player")
+        if cont is False:
+            break
 
-    grid_dim = get_grid_dim()
-    rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
-    while PLAYER.acell(rand_cell).value == "X":
-        rand_cell = random_coordinate(5, 5, 1)
-    computer_turn(rand_cell)
-    #add validator to see if game is over.
-    continue_game()
+        grid_dim = get_grid_dim()
+        rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
+        while PLAYER.acell(rand_cell).value == "X":
+            rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
+        computer_turn(rand_cell)
+        cont = check_game_resume("computer")
+        if cont is False:
+            break
 
 
 def forfeit_y_n():
@@ -304,7 +333,7 @@ def forfeit_y_n():
         raise ValueError(f"{option} is not a valid answer.")
 
 
-def setup():
+def main():
     """
     Run all program functions
     """
@@ -316,12 +345,11 @@ def setup():
         setup_list = setup_newgame()
     elif start_menu_input == "continue":
         continue_game()
-    elif start_menu_input == "forfeit":
-        forfeit_y_n()
+        main()
     computer_pos_ships(setup_list)
     position_ships(setup_list)
     continue_game()
+    main()
 
 
-get_grid_dim()
-setup()
+main()
