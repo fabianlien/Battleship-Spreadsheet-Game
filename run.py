@@ -17,6 +17,7 @@ SHEET = GSPREAD_CLIENT.open("battleship")
 PLAYER = SHEET.worksheet("player_board")
 COMPUTER = SHEET.worksheet("computer_board")
 HIT_MAP = SHEET.worksheet("hit_board")
+RULES = SHEET.worksheet("rules")
 
 
 def validate_menu_input(input_value):
@@ -139,7 +140,10 @@ def rules():
     """
     Prints the rules for how to play the game.
     """
-    print("insert rules string here...")
+    for i in range(1, 15):
+        print(RULES.acell(f"A{i}").value)
+    input("\n(Press enter to return to the menu.)\n\n")
+    main()
 
 
 def overwrite_current_game():
