@@ -143,7 +143,7 @@ def rules():
     """
     for i in range(1, 15):
         print(RULES.acell(f"A{i}").value)
-    input("\n(Press enter to return to the menu.)\n\n")
+    input("\n(Press any key and/or enter to return to the menu.)\n\n")
     main()
 
 
@@ -172,6 +172,44 @@ def setup_grid(setup_list, user):
         pprint(user.get_all_values())
 
 
+def computer_pos_ships(setup_list):
+    """
+    First generates the computer and hit map grids, then places ships randomly...
+    """
+    grid = [["." for a in range(setup_list[1])] for a in range(setup_list[0])]
+    for i in range(2, 5):
+        for x in range(setup_list[i]):
+            ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
+            ship_length = {2: 4, 3: 3, 4: 2}
+            while True:
+                rand_x = rand_int("x", setup_list, ship_length[i])
+                rand_y = rand_int("y", setup_list, ship_length[i])
+                for height in range(setup_list[0]):
+                    if "." in grid[height][rand_x]:
+                        for sl in range(ship_length[i]):
+                            grid[(rand_y + sl)][rand_x] = ship_type[i][0]
+                    break
+                break
+
+    dot_inst = 0
+    for y in range(setup_list[0]):
+        dot_inst = dot_inst + (grid[y].count("."))
+    ship_inst = setup_list[0] * setup_list[1] - dot_inst
+    max_ship_inst = 0
+    for i in range(2, 5):
+        max_ship_inst = max_ship_inst + setup_list[i] * ship_length[i]
+    if ship_inst != max_ship_inst:
+        computer_pos_ships(setup_list)
+    else:
+        print("Computer Ready!")
+        COMPUTER.clear()
+        SHEET.values_update(
+            'computer_board!A1',
+            params={'valueInputOption': 'RAW'},
+            body={'values': grid}
+        )
+
+
 def position_ships(setup_list):
     """
     First calls the setup grid function,
@@ -179,8 +217,10 @@ def position_ships(setup_list):
     If an error is caught, restarts the whole function.
     """
     setup_grid(setup_list, PLAYER)
+    setup_grid(setup_list, HIT_MAP)
     print("Place your ships by entering the coordinate for the front of \
 each ship.")
+#print each iteration of the loops to debug validation.
     for i in range(2, 5):
         for x in range(setup_list[i]):
             ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
@@ -227,42 +267,6 @@ def get_grid_dim():
     width = len(PLAYER.get_all_values()[0])
     grid_dim = [int(height), int(width)]
     return grid_dim
-
-
-def computer_pos_ships(setup_list):
-    """
-    First generates the computer and hit map grids, then places ships randomly.
-    """
-    setup_grid(setup_list, COMPUTER)
-    setup_grid(setup_list, HIT_MAP)
-    grid = COMPUTER.get_all_values()
-
-    for i in range(2, 5):
-        for x in range(setup_list[i]):
-            ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
-            ship_length = {2: 4, 3: 3, 4: 2}
-            while True:
-                rand_x = rand_int("x", setup_list, ship_length[i])
-                rand_y = rand_int("y", setup_list, ship_length[i])
-                for height in range(setup_list[0]):
-                    if "." in grid[height][rand_x]:
-                        for sl in range(ship_length[i]):
-                            grid[(rand_y + sl)][rand_x] = ship_type[i][0]
-                    break
-                break
-
-    dot_inst = 0
-    for y in range(setup_list[0]):
-        dot_inst = dot_inst + (grid[y].count("."))
-    ship_inst = setup_list[0] * setup_list[1] - dot_inst
-    max_ship_inst = 0
-    for i in range(2, 5):
-        max_ship_inst = max_ship_inst + setup_list[i] * ship_length[i]
-    if ship_inst != max_ship_inst:
-        test()
-    else:
-        pprint(grid)
-        print("Computer Ready!")
 
 
 def setup_newgame():
@@ -388,7 +392,7 @@ def main():
     elif start_menu_input == "continue":
         continue_game()
         main()
-    computer_pos_ships(setup_list)
+    comp_grid = computer_pos_ships(setup_list)
     position_ships(setup_list)
     continue_game()
     main()
@@ -402,9 +406,11 @@ def test():
     setup_grid([8, 8, 1, 1, 2], COMPUTER)
     setup_grid([5, 5, 1, 1, 2], HIT_MAP)
 
-    grid = COMPUTER.get_all_values()
-    
     setup_list = [8, 8, 2, 3, 3]
+
+    x_grid = ["." for cell in range(setup_list[1])]
+    grid = [x_grid for cell in range(setup_list[0])]
+    pprint(grid)
 
     for i in range(2, 5):
         for x in range(setup_list[i]):
