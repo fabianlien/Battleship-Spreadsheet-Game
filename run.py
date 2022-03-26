@@ -241,11 +241,23 @@ each ship.")
 
 def random_coordinate(grid_height, grid_width, ship_length):
     """
-    Generates a random coordinate based on grid dimensions.
+    Generates a random coordinate based on grid dimensions (uses
+    ship length when generating numbers for computer ship positions,
+    otherwise the function should be passed a shiplength of 1,
+    in which case the function will return a "(0,0)" coordinate,
+    and a "(A1)" coordinate).
     """
-    rand_num = random.randint(1, (grid_height - ship_length + 1))
-    rand_let = string.ascii_letters[random.randint(1, grid_width) - 1]
-    rand_coord = rand_let.upper() + str(rand_num)
+    if ship_length != 1:
+        rand_num = random.randint(1, (grid_height - ship_length + 1))
+        rand_let = string.ascii_letters[random.randint(1, grid_width) - 1]
+        rand_coord = rand_let.upper() + str(rand_num)
+    else:
+        rand_y = random.randint(0, grid_height - 1)
+        rand_x = random.randint(0, grid_width - 1)
+        rand_num = rand_y + 1
+        rand_let = string.ascii_letters[rand_x]
+        rand_grid_coord = rand_let.upper() + str(rand_num)
+        rand_coord = [rand_y, rand_x, rand_grid_coord]
     return rand_coord
 
 
@@ -328,23 +340,33 @@ def computer_turn(rand_cell):
     Prints a message then pretty prints the player's sheet.
     """
     print("Your grid:")
-    if PLAYER.acell(rand_cell).value == ".":
-        PLAYER.update_acell(rand_cell, "o")
-        pprint(PLAYER.get_all_values())
-        print(f"Computer fired at {rand_cell} and missed!")
-    else:
-        PLAYER.update_acell(rand_cell, "X")
-        pprint(PLAYER.get_all_values())
-        print(f"\nComputer fired at {rand_cell} and hit!")
+    grid = PLAYER.get_all_values()
+    rand_y = rand_cell[0]
+    rand_x = rand_cell[1]
+
+    while True:
+        if grid[rand_y][rand_x] == ".":
+            PLAYER.update_acell(rand_cell[2], "o")
+            pprint(PLAYER.get_all_values())
+            print(f"Computer fired at {rand_cell[2]} and missed!")
+            break
+        elif grid[rand_y][rand_x] == "o":
+            continue
+        else:
+            PLAYER.update_acell(rand_cell[2], "X")
+            pprint(PLAYER.get_all_values())
+            print(f"\nComputer fired at {rand_cell[2]} and hit!")
+            break
 
 
 def continue_game():
     """
     Gets the current game from the spreadsheets.
     If no current game is available, asks user to start new game.
-    Resumes at player's turn.
-    Plays the computer's turn, then validates if the game is over,
-    and if not, function calls itself again.
+    Resumes at player's turn. Validates player input, 
+    then checks if the game is over,
+    Plays the computer's turn, checks if the game is over,
+    and if not, repeats.
     """
     if COMPUTER.get_all_values() != []:
         while True:
@@ -358,7 +380,7 @@ def continue_game():
 
             grid_dim = get_grid_dim()
             rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
-            while PLAYER.acell(rand_cell).value == "X":
+            while PLAYER.acell(rand_cell[2]).value == "X":
                 rand_cell = random_coordinate(grid_dim[0], grid_dim[1], 1)
             computer_turn(rand_cell)
             cont = check_game_resume("computer")
