@@ -205,6 +205,20 @@ def random_coordinate(grid_height, grid_width, ship_length):
     return rand_coord
 
 
+def rand_int(val, setup_list, ship_length):
+    """
+    test
+    """
+    grid_height = setup_list[0]
+    grid_width = setup_list[1]
+    if val == "x":
+        rand_x = random.randint(0, (grid_width - 1))
+        return rand_x
+    if val == "y":
+        rand_y = random.randint(0, (grid_height - ship_length))
+        return rand_y
+
+
 def get_grid_dim():
     """
     Gets the grid dimensions from the player sheet and returns as a list.
@@ -221,36 +235,34 @@ def computer_pos_ships(setup_list):
     """
     setup_grid(setup_list, COMPUTER)
     setup_grid(setup_list, HIT_MAP)
-    ship_length = 4
-    
-    empty_grid = COMPUTER.get_all_values()
-    
+    grid = COMPUTER.get_all_values()
 
-    for i in range(3):
-        r_c = random_coordinate(setup_list[0], setup_list[1], ship_length)
-        print(r_c)
-        if COMPUTER.acell(r_c).value == ".":
-            for x in range(ship_length):
-                COMPUTER.update_acell((r_c[0].upper() + str(int(r_c[1])+x)), "B")
+    for i in range(2, 5):
+        for x in range(setup_list[i]):
+            ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
+            ship_length = {2: 4, 3: 3, 4: 2}
+            while True:
+                rand_x = rand_int("x", setup_list, ship_length[i])
+                rand_y = rand_int("y", setup_list, ship_length[i])
+                for height in range(setup_list[0]):
+                    if "." in grid[height][rand_x]:
+                        for sl in range(ship_length[i]):
+                            grid[(rand_y + sl)][rand_x] = ship_type[i][0]
+                    break
+                break
 
-
-    #for i in range(2, 5):
-    #    for x in range(setup_list[i]):
-    #        ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
-    #        ship_length = {2: 4, 3: 3, 4: 2}
-    #        r_c = random_coordinate(setup_list[0], setup_list[1])
-    #        for cell in range(ship_length[i]):
-    #            if COMPUTER.acell(r_c[0].upper() + str(int(r_c[1])+cell)).value == ".":
-    #                update = r_c[0].upper() + str(int(r_c[1])+cell)
-    #                COMPUTER.update_acell(update, ship_type[i][0])
-    #            else:
-    #                random_coordinate(setup_list[0], setup_list[1])
-
-    #COMPUTER.update_acell(r_c[0].upper() + str(int(r_c[1])+cell), ship_type[i][0])
-                #update = r_c[0].upper() + str(int(r_c[1])+cell)
-                #COMPUTER.update_acell(update, ship_type[i][0])
-
-    print("Computer Ready!")
+    dot_inst = 0
+    for y in range(setup_list[0]):
+        dot_inst = dot_inst + (grid[y].count("."))
+    ship_inst = setup_list[0] * setup_list[1] - dot_inst
+    max_ship_inst = 0
+    for i in range(2, 5):
+        max_ship_inst = max_ship_inst + setup_list[i] * ship_length[i]
+    if ship_inst != max_ship_inst:
+        test()
+    else:
+        pprint(grid)
+        print("Computer Ready!")
 
 
 def setup_newgame():
@@ -382,48 +394,43 @@ def main():
     main()
 
 
-def rand_int(val, ship_length):
-    """
-    test
-    """
-    #grid height length should be passed
-    grid_height = 6
-    grid_width = 6
-    if val == "x":
-        rand_x = random.randint(0, (grid_width - 1))
-        return rand_x
-    if val == "y":
-        rand_y = random.randint(1, (grid_height - ship_length))
-        return rand_y
-
-
 def test():
     """
     test function
     """
 
-    setup_grid([6, 6, 1, 1, 2], COMPUTER)
-    setup_grid([6, 6, 1, 1, 2], HIT_MAP)
+    setup_grid([8, 8, 1, 1, 2], COMPUTER)
+    setup_grid([5, 5, 1, 1, 2], HIT_MAP)
 
     grid = COMPUTER.get_all_values()
-    print(rand_int("y", 4))
-    print(rand_int("x", 4))
-    grid[rand_int("y", 4)][rand_int("x", 4)] = "B"
-    pprint(grid)
+    
+    setup_list = [8, 8, 2, 3, 3]
 
-    col_occupied = True
-    while col_occupied is True:
-        rand_x = rand_int("x", 4)
-        if "B" not in grid[rand_x]:
-            grid[rand_int("y", 4)][rand_x] = "B"
-            col_occupied = False
-    pprint(grid)
+    for i in range(2, 5):
+        for x in range(setup_list[i]):
+            ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
+            ship_length = {2: 4, 3: 3, 4: 2}
+            while True:
+                rand_x = rand_int("x", setup_list, ship_length[i])
+                rand_y = rand_int("y", setup_list, ship_length[i])
+                for height in range(setup_list[0]):
+                    if "." in grid[height][rand_x]:
+                        for sl in range(ship_length[i]):
+                            grid[(rand_y + sl)][rand_x] = ship_type[i][0]
+                    break
+                break
 
+    dot_inst = 0
+    for y in range(setup_list[0]):
+        dot_inst = dot_inst + (grid[y].count("."))
+    ship_inst = setup_list[0] * setup_list[1] - dot_inst
+    max_ship_inst = 0
+    for i in range(2, 5):
+        max_ship_inst = max_ship_inst + setup_list[i] * ship_length[i]
+    if ship_inst != max_ship_inst:
+        test()
+    else:
+        pprint(grid)
 
-
-
-
-
-
-test()
-#main()
+#test()
+main()
