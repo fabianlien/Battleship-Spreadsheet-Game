@@ -161,7 +161,7 @@ def overwrite_current_game():
 
 def setup_grid(setup_list, user):
     """
-    Clears the board, then adds a new grid,
+    Clears the board, then adds a new grid.
     Pprints the grid if initiated by PLAYER.
     """
     user.clear()
@@ -174,7 +174,10 @@ def setup_grid(setup_list, user):
 
 def computer_pos_ships(setup_list):
     """
-    First generates the computer and hit map grids, then places ships randomly...
+    First generates the computer grid, then places ships randomly.
+    Then checks if ships were correctly placed on the grid, and if not,
+    restarts the function and resets the grid. This loops until placement
+    is correct, at which point the grid is used to update "COMPUTER".
     """
     grid = [["." for a in range(setup_list[1])] for a in range(setup_list[0])]
     for i in range(2, 5):
@@ -203,6 +206,7 @@ def computer_pos_ships(setup_list):
     else:
         print("Computer Ready!")
         COMPUTER.clear()
+        # Lines 207 to 211 are copied from external code. See readme.
         SHEET.values_update(
             'computer_board!A1',
             params={'valueInputOption': 'RAW'},
@@ -220,7 +224,7 @@ def position_ships(setup_list):
     setup_grid(setup_list, HIT_MAP)
     print("Place your ships by entering the coordinate for the front of \
 each ship.")
-#print each iteration of the loops to debug validation.
+# print each iteration of the loops to debug validation.
     for i in range(2, 5):
         for x in range(setup_list[i]):
             ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
@@ -301,18 +305,19 @@ def player_turn(coord):
     Then updates the hit map and computer sheets annd prints a message.
     Finally pretty prints the hitmap.
     """
+    wave = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     if validate_strike_coord(coord):
         cell = coord[0].upper() + str(int(coord[1]))
         if COMPUTER.acell(cell).value == ".":
             COMPUTER.update_acell(cell, "X")
             HIT_MAP.update_acell(cell, "o")
-            print(f"\n{cell} was a miss!\n")
+            print(f"\n{cell} was a miss!\n{wave}")
         elif COMPUTER.acell(cell).value == "X":
-            print("You have already fired there... Too bad.")
+            print(f"You had already fired at {cell}... Too bad.\n{wave}")
         else:
             COMPUTER.update_acell(cell, "X")
             HIT_MAP.update_acell(cell, "X")
-            print(f"\n{cell} was a hit!\n")
+            print(f"\n{cell} was a hit!\n{wave}")
     else:
         continue_game()
 
@@ -322,13 +327,15 @@ def computer_turn(rand_cell):
     Takes the coordinate passed and updates the player sheet.
     Prints a message then pretty prints the player's sheet.
     """
+    print("Your grid:")
     if PLAYER.acell(rand_cell).value == ".":
-        PLAYER.update_acell(rand_cell, "X")
-        print(f"Computer fired at {rand_cell} and missed!\n")
+        PLAYER.update_acell(rand_cell, "o")
+        pprint(PLAYER.get_all_values())
+        print(f"Computer fired at {rand_cell} and missed!")
     else:
         PLAYER.update_acell(rand_cell, "X")
-        print(f"\nComputer fired at {rand_cell} and hit!\n")
-    pprint(PLAYER.get_all_values())
+        pprint(PLAYER.get_all_values())
+        print(f"\nComputer fired at {rand_cell} and hit!")
 
 
 def continue_game():
@@ -341,7 +348,7 @@ def continue_game():
     """
     if COMPUTER.get_all_values() != []:
         while True:
-            print("\n")
+            print("\nOpponents grid:")
             pprint(HIT_MAP.get_all_values())
             cell = input("Your turn. Enter coordinate to hit: ")
             player_turn(cell)
@@ -365,20 +372,6 @@ def continue_game():
         main()
 
 
-def forfeit_y_n():
-    """
-    Asks the user if they want to forfeit and either resets the game or
-    continues.
-    """
-    option = input("Are you sure you want to forfeit? Yes/No: ")
-    if list(option)[0].lower() == "y":
-        print("You lost.")
-    elif list(option)[0].lower() == "n":
-        print("Resume game:")
-    else:
-        raise ValueError(f"{option} is not a valid answer.")
-
-
 def main():
     """
     Run all program functions
@@ -392,51 +385,10 @@ def main():
     elif start_menu_input == "continue":
         continue_game()
         main()
-    comp_grid = computer_pos_ships(setup_list)
+    computer_pos_ships(setup_list)
     position_ships(setup_list)
     continue_game()
     main()
 
 
-def test():
-    """
-    test function
-    """
-
-    setup_grid([8, 8, 1, 1, 2], COMPUTER)
-    setup_grid([5, 5, 1, 1, 2], HIT_MAP)
-
-    setup_list = [8, 8, 2, 3, 3]
-
-    x_grid = ["." for cell in range(setup_list[1])]
-    grid = [x_grid for cell in range(setup_list[0])]
-    pprint(grid)
-
-    for i in range(2, 5):
-        for x in range(setup_list[i]):
-            ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
-            ship_length = {2: 4, 3: 3, 4: 2}
-            while True:
-                rand_x = rand_int("x", setup_list, ship_length[i])
-                rand_y = rand_int("y", setup_list, ship_length[i])
-                for height in range(setup_list[0]):
-                    if "." in grid[height][rand_x]:
-                        for sl in range(ship_length[i]):
-                            grid[(rand_y + sl)][rand_x] = ship_type[i][0]
-                    break
-                break
-
-    dot_inst = 0
-    for y in range(setup_list[0]):
-        dot_inst = dot_inst + (grid[y].count("."))
-    ship_inst = setup_list[0] * setup_list[1] - dot_inst
-    max_ship_inst = 0
-    for i in range(2, 5):
-        max_ship_inst = max_ship_inst + setup_list[i] * ship_length[i]
-    if ship_inst != max_ship_inst:
-        test()
-    else:
-        pprint(grid)
-
-#test()
 main()
