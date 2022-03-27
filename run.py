@@ -56,16 +56,20 @@ def validate_grid_len(height, width):
         return False
 
 
-def validate_coordinate(coordinate, cell):
+def validate_coordinate(coord, cell):
     """
     Validates the input coordinates when placing ships.
     """
-    let = coordinate[0]
-    num = coordinate[1]
     try:
-        if len(coordinate) != 2 or let not in string.ascii_letters:
+        if len(coord) != 2:
             raise RuntimeError(
-                f"{coordinate}. It should be a letter followed by a number"
+                f"{coord}. It should be a letter followed by a single number"
+                )
+        let = coord[0]
+        num = coord[1]
+        if let not in string.ascii_letters:
+            raise RuntimeError(
+                f"{coord}. The first character cannot be a number"
                 )
         elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
             raise RuntimeError("You cannot place a ship outside of the grid")
@@ -77,16 +81,21 @@ def validate_coordinate(coordinate, cell):
     return True
 
 
-def validate_strike_coord(coordinate):
+def validate_strike_coord(coord):
     """
     Validates the input coordinates when firing.
     """
-    let = coordinate[0]
-    num = coordinate[1]
+
     try:
-        if len(coordinate) != 2:
+        if len(coord) != 2:
             raise RuntimeError(
-                f"{coordinate}. It should be a letter followed by a number"
+                f"{coord}. It should be a letter followed by a single number"
+                )
+        let = coord[0]
+        num = coord[1]
+        if let not in string.ascii_letters:
+            raise RuntimeError(
+                f"{coord}. The first character cannot be a number"
                 )
         elif COMPUTER.acell(let.upper() + str(int(num))).value is None:
             raise RuntimeError("You cannot fire outside of the grid")
@@ -123,13 +132,13 @@ def check_game_resume(user):
 def start_menu():
     """
     Prints the welcome message and input options on
-    when file is first excecuted.
+    when file is run, and when called.
     """
     while True:
-        print(RULES.acell("A16").value)
-        print("\n                Welcome to Battleship!\n")
+        print(f'\n\n{RULES.acell("A16").value}')
+        print("\n\n                Welcome to Battleship!\n\n")
         print("The classic World War 1 game, running in your terminal!\n")
-        print('Type one of the following commands below and hit enter:\
+        print('Type one of the following commands below and hit enter:\n\
     "Rules",    "NewGame",    "Continue"')
         input_command = input("Enter command: \n")
         if validate_menu_input(input_command):
@@ -213,7 +222,7 @@ def computer_pos_ships(setup_list):
     else:
         print("Computer Ready!")
         COMPUTER.clear()
-        # Lines 216 to 220 are copied from external code. See readme.
+        # Lines 226 to 230 below are copied from external code. See readme.
         SHEET.values_update(
             'computer_board!A1',
             params={'valueInputOption': 'RAW'},
@@ -229,8 +238,8 @@ def position_ships(setup_list):
     """
     setup_grid(setup_list, PLAYER)
     setup_grid(setup_list, HIT_MAP)
-    print("Place your ships by entering the coordinate for the front of \
-each ship.")
+    print('\nPlace your ships by entering the coordinate for the front of \
+each ship.\nExample: "A1"')
 # print each iteration of the loops to debug validation.
     for i in range(2, 5):
         for x in range(setup_list[i]):
@@ -344,7 +353,7 @@ def player_turn(coord):
 def computer_turn(rand_cell):
     """
     Takes the coordinate passed and updates the player sheet.
-    Prints a message then pretty prints the player's sheet.
+    Prints a message, then pretty prints the player's sheet.
     """
     print("Your grid:")
     grid = PLAYER.get_all_values()

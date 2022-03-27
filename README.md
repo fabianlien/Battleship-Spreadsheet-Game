@@ -2,7 +2,7 @@
 
 This is a python-based console version of the classic world war I game "Battleship". It has been deployed to a Heroku mock terminal.
 
-[Here is a link to the live project.](insert url here!)
+[Here is a link to the live project.](https://battleship3.herokuapp.com/)
 
 The objective of the game is simple: sink all of your opponents ships before the opponent sinks yours. In this version of the game you play against the computer in the terminal.
 
@@ -88,15 +88,11 @@ The steps neccesary for deployment are as follows:
 Troubleshooting and tutorials:  
 [Stack Overflow](https://stackoverflow.com/)  
 [W3 Schools](https://www.w3schools.com/python/)  
-[Techie Delight](https://www.techiedelight.com/)
+[Techie Delight](https://www.techiedelight.com/)  
+[Geeks for Geeks](https://www.geeksforgeeks.org/)  
 
 Media:  
 [ASCII Artwork](https://www.asciiart.eu/vehicles/navy)
 
 Code:  
-There are a few lines of code copied from gspread developer Burnash in a Stack Overflow forum. It has been repurposed for my specific documents and variables but should not be considered original code. Please see lines 216 - 220 in run.py
-
-
-
-
-
+There are a few lines of code copied from gspread developer Burnash in a Stack Overflow forum. It has been repurposed for my specific documents and variables but should not be considered original code. Please see lines 226 - 230 in run.py
