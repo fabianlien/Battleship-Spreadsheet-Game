@@ -131,7 +131,7 @@ def start_menu():
         print("The classic World War 1 game, running in your terminal!\n")
         print('Type one of the following commands below and hit enter:\
     "Rules",    "NewGame",    "Continue"')
-        input_command = input("Enter command: ")
+        input_command = input("Enter command: \n")
         if validate_menu_input(input_command):
             break
     return input_command.lower()
@@ -143,7 +143,8 @@ def rules():
     """
     for i in range(1, 15):
         print(RULES.acell(f"A{i}").value)
-    input("\n(Press any key and/or enter to return to the menu.)\n\n")
+    input("\n(Press any key and/or enter to return to the menu.)")
+    print("\n\n")
     main()
 
 
@@ -154,7 +155,7 @@ def overwrite_current_game():
     if COMPUTER.get_all_values() != []:
         while True:
             print("\nStarting a new game will overwrite your current game")
-            input_val = input("Are you sure you want to proceed? Y/N: ")
+            input_val = input("Are you sure you want to proceed? Y/N: \n")
             if input_val.lower() in ["yes", "yeah", "y"]:
                 print("Starting a new game...")
                 break
@@ -235,7 +236,7 @@ each ship.")
         for x in range(setup_list[i]):
             ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
             ship_length = {2: 4, 3: 3, 4: 2}
-            coord = input(f"Place your {ship_type[i]}: ")
+            coord = input(f"Place your {ship_type[i]}: \n")
             for cell in range(ship_length[i]):
                 if validate_coordinate(coord, cell):
                     update = coord[0].upper() + str(int(coord[1])+cell)
@@ -298,8 +299,8 @@ def setup_newgame():
     overwrite_current_game()
     while True:
         print("\nPlease define the game parameters:")
-        grid_height = input("Grid height (5-9): ")
-        grid_width = input("Grid width (5-9): ")
+        grid_height = input("Grid height (5-9): \n")
+        grid_width = input("Grid width (5-9): \n")
         if validate_grid_len(grid_height, grid_width):
             break
     grid_height = int(grid_height)
@@ -378,7 +379,7 @@ def continue_game():
         while True:
             print("\nOpponents grid:")
             pprint(HIT_MAP.get_all_values())
-            cell = input("Your turn. Enter coordinate to hit: ")
+            cell = input("Your turn. Enter coordinate to hit: \n")
             player_turn(cell)
             cont = check_game_resume("player")
             if cont is False:
