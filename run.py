@@ -212,7 +212,7 @@ def computer_pos_ships(setup_list):
     else:
         print("Computer Ready!")
         COMPUTER.clear()
-        # Lines 207 to 211 are copied from external code. See readme.
+        # Lines 216 to 220 are copied from external code. See readme.
         SHEET.values_update(
             'computer_board!A1',
             params={'valueInputOption': 'RAW'},

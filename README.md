@@ -93,6 +93,9 @@ Troubleshooting and tutorials:
 Media:  
 [ASCII Artwork](https://www.asciiart.eu/vehicles/navy)
 
+Code:  
+There are a few lines of code copied from gspread developer Burnash in a Stack Overflow forum. It has been repurposed for my specific documents and variables but should not be considered original code. Please see lines 216 - 220 in run.py
+
 
 
 
