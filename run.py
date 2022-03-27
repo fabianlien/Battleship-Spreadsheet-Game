@@ -63,14 +63,14 @@ def validate_coordinate(coordinate, cell):
     let = coordinate[0]
     num = coordinate[1]
     try:
-        if len(coordinate) != 2:
+        if len(coordinate) != 2 or let not in string.ascii_letters:
             raise RuntimeError(
                 f"{coordinate}. It should be a letter followed by a number"
                 )
         elif PLAYER.acell(let.upper() + str(int(num)+cell)).value is None:
             raise RuntimeError("You cannot place a ship outside of the grid")
         elif PLAYER.acell(let.upper() + str(int(num)+cell)).value != ".":
-            raise RuntimeError("You canot place a ship on another ship")
+            raise RuntimeError("You cannot place a ship on another ship")
     except RuntimeError as e:
         print(f"\n\nInavlid coordinate selected: {e}, please try again.\n")
         return False
@@ -152,11 +152,17 @@ def overwrite_current_game():
     Checks if the user wants to overwrite the current game and validates input.
     """
     if COMPUTER.get_all_values() != []:
-        print("\nStarting a new game will overwrite your current game")
-        input_val = input("Are you sure you want to proceed? Y/N: ")
-        if list(input_val)[0].lower() != "y":
-            print("\nResuming current game...")
-            continue_game()
+        while True:
+            print("\nStarting a new game will overwrite your current game")
+            input_val = input("Are you sure you want to proceed? Y/N: ")
+            if input_val.lower() in ["yes", "yeah", "y"]:
+                print("Starting a new game...")
+                break
+            elif input_val.lower() in ["no", "nope", "n"]:
+                print("Resuming previous game...")
+                continue_game()
+            else:
+                print("You must enter either Yes / Y or No / N.")
 
 
 def setup_grid(setup_list, user):
