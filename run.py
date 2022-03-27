@@ -240,7 +240,6 @@ def position_ships(setup_list):
     setup_grid(setup_list, HIT_MAP)
     print('\nPlace your ships by entering the coordinate for the front of \
 each ship.\nExample: "A1"')
-# print each iteration of the loops to debug validation.
     for i in range(2, 5):
         for x in range(setup_list[i]):
             ship_type = {2: "Battleship", 3: "Cruiser", 4: "Destroyer"}
@@ -379,7 +378,7 @@ def continue_game():
     """
     Gets the current game from the spreadsheets.
     If no current game is available, asks user to start new game.
-    Resumes at player's turn. Validates player input, 
+    Resumes at player's turn. Validates player input,
     then checks if the game is over,
     Plays the computer's turn, checks if the game is over,
     and if not, repeats.
